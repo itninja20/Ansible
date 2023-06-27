@@ -1,0 +1,2 @@
+hashicorp:
+  api_url: "https://api.releases.hashicorp.com/v1/releases"

@@ -1,0 +1,46 @@
+---
+- name: create service user
+  become: true
+  become_method: sudo
+  user:
+    name: "{{ vault_user }}"
+    shell: "/usr/sbin/nologin"
+    group: "{{ vault_user }}"
+    expires: -1
+    state: present
+    password: "*"
+    create_home: false
+    system: true
+- name: create vault config directory
+  become: true
+  become_method: sudo
+  file:
+    path: /etc/vault.d
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+- name: render vault config
+  become: true
+  become_method: sudo
+  templates:
+    src: config.hcl.j2
+    dest: /etc/vault.d/config.hcl
+    mode: 0644
+    owner: root
+    group: root
+- name: render systemd unit file
+  become: true
+  become_method: sudo
+  templates:
+    src: vault.service.j2
+    dest: /etc/systemd/system/vault.service
+    mode: 0644
+    owner: root
+    group: root
+- name: enable systemd service
+  shell: "sudo {{ item }}"
+  loop:
+    - "systemctl daemon-reload"
+    - "systemctl enable vault.service"
+...

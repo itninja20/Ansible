@@ -1,0 +1,15 @@
+- name: rollout pi4 baseline
+  hosts: access_point
+  tasks:
+    - name: configure apt sources
+      include_role:
+        name: baseline
+        tasks_from: apt/config.yaml
+    - name: install base packages 
+      include_role:
+        name: baseline
+        tasks_from: apt/packages.yaml
+    - name: configure alfa interface
+      include_role:
+        name: baseline
+        tasks_from: networking/rtl8814au.yaml 

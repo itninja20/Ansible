@@ -1,0 +1,6 @@
+- name: install base packages
+  include_role:
+    name: apt
+    tasks_from: install.yaml
+  vars:
+    packages: "{{ base_packages }}"

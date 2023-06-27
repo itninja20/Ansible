@@ -1,0 +1,28 @@
+---
+- name: get releases
+  local_action:
+    module: uri
+    url: "{{ hashicorp.api_url }}/vault"
+  register: json_vault_release
+- name: check response
+  set_fact:
+    current_release: "{{ current_release + [item.version] }}"
+  when: '"ent" not in item.version'
+  loop: "{{ json_vault_release.json }}"
+- name: get download url
+  local_action:
+    module: uri
+    url: "{{ hashicorp.api_url }}/vault/{{ current_release[0] }}"
+  register: json_vault_release
+- name: set release url
+  set_fact:
+    download_src: "{{ item.url }}"
+    release_url: "{{ item.url }}"
+    #download_file: "vault_{{ current_releases[0] }}_linux_arm64.zip"
+  when:
+    - item.arch == "arm64"
+    - item.os == "linux"
+  loop: "{{ json_vault_release.json.builds }}"
+- debug:
+    msg: "{{ download_src }} | {{ current_release[0] }}"
+...

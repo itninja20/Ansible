@@ -1,0 +1,5 @@
+vault_data_path: "/vault/data"
+vault_config_path: "/etc/vault.d"
+vault_user: "vault"
+vault_group: "vault"
+# vault_addr: "{{ ansible_eth0.ipv4.address }}"

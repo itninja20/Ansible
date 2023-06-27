@@ -1,0 +1,20 @@
+base_packages:
+  - sudo
+  - wget
+  - git
+  - dkms
+  - libraspberrypi-bin
+  - libraspberrypi-doc
+  - libraspberrypi-dev
+  - kalipi-kernel
+  - kalipi-bootloader
+  - kalipi-re4son-firmware
+  - kalipi-kernel-headers
+  - libraspberrypi0
+  - bc
+  - mokutil
+  - build-essential
+  - libelf-dev
+  - hcxdumptool
+  - hcxtools
+  - kalipi-config

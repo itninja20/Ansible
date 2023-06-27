@@ -1,0 +1,7 @@
+- name: Download and install hashicorp vault
+  hosts: scanner
+  tasks:
+    - name: vault install
+      include_role:
+        name: hashicorp_vault
+        tasks_from: install.yaml

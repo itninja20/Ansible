@@ -1,0 +1,3 @@
+alfanet_branch: v5.6.4.2
+alfanet_remote_repo: https://github.com/aircrack-ng/rtl8812au.git
+alfanet_local_repo: /home/{{ ansible_user }}/.local/share/rtl8812au

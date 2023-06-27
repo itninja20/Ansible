@@ -1,0 +1,45 @@
+---
+#--
+# Release File
+#--
+- debug:
+    msg: "{{ current_release }}"
+- name: set release file
+  set_fact:
+    download_file: "vault_{{ current_release[0] }}_linux_arm64.zip"
+- name: print response
+  debug:
+    msg: "{{ item }}"
+  loop:
+    - "url: {{ release_url }}"
+    - "file: {{ download_file }}"
+#--
+# Download Release
+#--
+- name: download zip file
+  shell: "wget -q -O {{ download_dest }}/{{ download_file }} {{ download_src }}"
+- name: check if file exists
+  stat:
+    path: "{{ download_dest }}/{{ download_file }}"
+  register: zipfile
+#--
+# Extract
+#--
+- name: download release & extract
+  block:  
+    - name: extract zip file
+      become: true
+      become_method: sudo
+      unarchive:
+        src: "{{ zipfile.stat.path }}"
+        dest: "/usr/local/bin/"
+        mode: "0775"
+        owner: "root"
+        group: "root"
+        remote_src: yes
+    - name: delete downloaded zip file
+      file:
+        path: "{{ zipfile.stat.path }}"
+        state: absent
+  when: zipfile.stat.path is defined
+...

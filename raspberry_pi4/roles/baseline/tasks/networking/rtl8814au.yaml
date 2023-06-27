@@ -1,0 +1,41 @@
+- name: check local repository
+  stat:
+    path: /home/{{ ansible_user }}/.local/share/rtl8812au
+  register: repo
+- name: clone repository
+  ansible.builtin.git:
+    repo: https://github.com/aircrack-ng/rtl8812au.git
+    dest: /home/{{ ansible_user }}/.local/share/rtl8812au
+    clone: yes
+  when: repo.stat.path is not defined
+- name: clone repository
+  ansible.builtin.git:
+    repo: "{{ alfanet_remote_repo }}"
+    dest: "{{ alfanet_local_repo }}"
+    clone: no
+    update: no
+  when: repo.stat.path is defined
+- name: clone repository
+  ansible.builtin.git:
+    repo: "{{ alfanet_remote_repo }}" 
+    dest: "{{ alfanet_local_repo }}" 
+    single_branch: yes
+    version: "{{ alfanet_branch }}"
+  when: repo.stat.path is not defined
+- name: compile rtl8812au driver and install
+  block:
+    - name: copy Makefile
+      copy:
+        src: "alfanet/{{ item }}"
+        dest: "{{ alfanet_local_repo }}/{{ item }}"
+        mode: 0644
+      loop:
+        - Makefile
+        - dkms.conf
+    - name: compile driver
+      shell: "cd {{ alfanet_local_repo }} && export ARCH=arm64 && make && sudo make dkms_install"
+
+
+
+
+

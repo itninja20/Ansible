@@ -1,0 +1,5 @@
+#- set_fact:
+    #current_release: []
+    #download_file: ""
+- include_tasks: release_api.yaml
+- include_tasks: download.yaml

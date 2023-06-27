@@ -1,0 +1,7 @@
+- name: install packages
+  become: yes
+  become_method: sudo
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: latest
+  loop: "{{ packages }}"

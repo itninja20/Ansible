@@ -1,0 +1,5 @@
+packages: []
+valid_apt_action:
+  - install
+  - remove
+  - update

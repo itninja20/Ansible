@@ -1,0 +1,8 @@
+- name: configure apt sources
+  become: yes
+  copy:
+    src: re4son.list
+    dest: /etc/apt/sources.list.d/re4son.list
+    mode: 0644
+    owner: root
+    group: root
