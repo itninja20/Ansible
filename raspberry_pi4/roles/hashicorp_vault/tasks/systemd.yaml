@@ -1,0 +1,26 @@
+- name: Enable service vault and ensure it is not masked and reloaded
+  ansible.builtin.systemd:
+    name: vault.service
+    enabled: true
+    masked: no
+    daemon_reload: true
+  when: systemd_state == "configure"
+- name: Reload daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when: systemd_state == "reload"
+- name: Stop service vault on debian, if running
+  ansible.builtin.systemd:
+    name: vault.service
+    state: stopped
+  when: systemd_state == "stop" 
+- name: Restart service vault on debian, if running
+  ansible.builtin.systemd:
+    name: vault.service
+    state: restarted
+  when: systemd_state == "restart"
+- name: Make sure a service unit is running
+  ansible.builtin.systemd:
+    state: started
+    name: vault.service
+  when: systemd_state == "start"

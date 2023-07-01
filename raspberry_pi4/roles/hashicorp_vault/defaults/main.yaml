@@ -1,3 +1,34 @@
+#--
+# Defaults
+#--
+vault_user: "vault"
+vault_home: "/opt/hashicorp/vault"
+vault_conf: "{{ vault_home }}/config.hcl"
+vault_data: "{{ vault_home }}/data"
+vault_node: ""
+vault_srv:
+  pid: "/var/run/vault.pid"
+  path: "/etc/systemd/system"
+  unit: "/etc/systemd/system/vault.service"
+  umask: "022"
+
+#--
+# Runtime Variables
+#--
+checks:
+  home_dir: True
+  conf_file: True
+  unit_file: True
+#--
+# Config File
+#--
+vault_tls: "disable"
+vault_port: "8200"
+vault_cluster_port: "8201"
+vault_ui: "true"
+#--
+# Download & Install
+#--
 vault_release_url: "{{ hashicorp.api_url }}/vault"
 json_vault_release: {}
 release_url: ""

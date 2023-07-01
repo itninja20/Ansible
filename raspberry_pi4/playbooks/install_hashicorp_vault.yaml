@@ -1,7 +1,17 @@
 - name: Download and install hashicorp vault
   hosts: scanner
   tasks:
-    - name: vault install
+    - name: Installation
       include_role:
         name: hashicorp_vault
         tasks_from: install.yaml
+    - name: Configure
+      include_role:
+        name: hashicorp_vault
+        tasks_from: configure.yaml
+    - name: Start service
+      include_role:
+        name: hashicorp_vault
+        tasks_from: systemd.yaml
+      vars:
+        systemd_state: "start"

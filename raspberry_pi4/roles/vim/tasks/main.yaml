@@ -1,0 +1,33 @@
+---
+- name: check local vim repo
+  ansible.builtin.stat:
+    path: "{{ vim_dest_path }}"
+  register: repo_check
+- name: create repo dir
+  become: true
+  become_method: sudo
+  ansible.builtin.file:
+    path: "{{ vim_dest_path }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    recurse: true
+  when: repo_check.stat.path is defined
+- name: clone vim repo
+  ansible.builtin.git:
+    repo: "{{ vim_repo_url }}"
+    dest: "{{ vim_dest_path }}"
+    single_branch: yes
+    version: master
+    depth: 1
+    clone: yes
+- name: install vim
+  become: true
+  become_method: sudo
+  shell: "sh {{ vim_dest_path }}/install_awesome_parameterized.sh {{ vim_uers }}"
+- name: check installation
+  ansible.builtin.stat:
+    path: "/home/{{ ansible_user }}/.vim_runtime"
+  register: check_vim_runtime
+...

@@ -1,0 +1,64 @@
+---
+- name: pre checks
+  block:
+    - name: check home dir
+      stat:
+        path: "{{ vault_home }}"
+      register: check_vault_home
+    - name: set home dir state
+      set_fact:
+        when: check_vault_home.stat.path is not defined
+        checks.home_dir: False
+    - name: check config file
+      stat:
+        path: "{{ vault_config_file }}"
+      register: check_conf
+    - name: set conf file state
+      set_fact:
+        when: check_conf.stat.path is not defined
+        checks.conf_file: False
+    - name: check systemd unit file
+      stat:
+        path: "{{ vault_srv.unit }}"
+      register: check_unit
+- name: init directories
+  block:
+    - name: create home directory
+      become: true
+      become_method: sudo
+      file:
+        path: "{{ vault_home }}"
+        state: directory
+        owner: "{{ vault_user }}"
+        group: "{{ vault_user }}"
+        mode: 0755
+      loop:
+        - "{{ vault_home }}"
+        - "{{ vault_data }}"
+  when: checks.home_dir
+- name: init config file
+  block:
+    - name: render config file
+      template:
+        src: 
+        dest: "{{ vault_config_file }}"
+        owner: "{{ vault_user }}"
+        group: "{{ vault_user }}"
+        mode: 0644
+  when: checks.conf_file
+- name: configure systemd
+  block:
+    - name: render unit file
+      become: true
+      become_method: sudo
+      template:
+        src: vault.service.j2
+        dest: "{{ vault_srv.unit }}"
+        mode: '0644'
+        owner: "root"
+        group: "root"
+    - name: init systemd
+      include_tasks: systemd.yaml
+      vars:
+        systemd_state: "configure"
+  when: check_unit.stat.path is not defined
