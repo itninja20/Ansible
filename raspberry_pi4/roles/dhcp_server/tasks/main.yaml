@@ -1,0 +1,35 @@
+- name: Install DHCP Server packages
+  become: true
+  package:
+    name: "{{ dhcp_server.packages[ansible_distribution] }}"
+    state: present
+  when: ansible_os_family == 'Debian' or ansible_os_family == 'RedHat'
+
+- name: Configure DHCP server
+  become: true
+  block:
+    - name: Copy DHCP server configuration file
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: "{{ item.mode }}"
+      with_items:
+        - { src: "dhcpd.conf.j2", dest: "/etc/dhcp/dhcpd.conf", mode: "0644" }
+      notify: Restart DHCP service
+
+    - name: Configure DHCP server on Windows
+      win_template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      with_items:
+        - { src: "dhcpd.conf.j2", dest: "C:/Windows/System32/dhcp/dhcpd.conf" }
+      notify: Restart DHCP service
+  when: ansible_os_family == 'Debian' or ansible_os_family == 'RedHat' or ansible_os_family == 'Windows'
+
+  handlers:
+    - name: Restart DHCP service
+      become: true
+      service:
+        name: "{{ 'isc-dhcp-server' if ansible_os_family == 'Debian' else 'dhcpd' if ansible_os_family == 'RedHat' else 'dhcp' }}"
+        state: restarted
+      ignore_errors: yes

@@ -1,0 +1,17 @@
+[connection]
+id={{ global_vars.network.iface.names[0] }}
+uuid={{ eth_nm_uuid }}
+type={{ global_vars.network.iface.type }}
+autoconnect-priority=-999
+interface-name={{ global_vars.network.iface.names[0] }}
+
+[ethernet]
+
+[ipv4]
+method={{ global_vars.network.iface.eth.method }}
+
+[ipv6]
+addr-gen-mode=default
+method=disabled
+
+[proxy]

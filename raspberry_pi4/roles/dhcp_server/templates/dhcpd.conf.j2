@@ -1,0 +1,37 @@
+# dhcpd.conf
+#
+# Sample configuration file for ISC dhcpd
+#
+
+default-lease-time 600;
+max-lease-time 7200;
+
+# The ddns-updates-style parameter controls whether or not the server will
+# attempt to do a DNS update when a lease is confirmed. We default to the
+# behavior of the version 2 packages ('none', since DHCP v2 didn't
+# have support for DDNS.)
+ddns-update-style none;
+
+# If this DHCP server is the official DHCP server for the local
+# network, the authoritative directive should be uncommented.
+authoritative;
+
+# Use this to send dhcp log messages to a different log file (you also
+# have to hack syslog.conf to complete the redirection).
+log-facility local7;
+
+# Allow each client to have exactly one lease, and expire
+# old leases if a new DHCPDISCOVER occurs
+one-lease-per-client true;
+
+# Tell the server to look up the host name in DNS
+get-lease-hostnames true;
+
+# No service will be given on this subnet, but declaring it helps the
+# DHCP server to understand the network topology.
+subnet 192.168.1.0 netmask 255.255.255.0 {
+    range 192.168.1.100 192.168.1.200;
+    option subnet-mask 255.255.255.0;
+    option broadcast-address 192.168.1.255;
+    option routers 192.168.1.1;
+}

@@ -1,0 +1,12 @@
+[Unit]
+Requires=udisks2.service
+Requires=graphical.target
+After=graphical.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStop=/usr/local/bin/handle_external_hdds.sh
+
+[Install]
+WantedBy=graphical.target

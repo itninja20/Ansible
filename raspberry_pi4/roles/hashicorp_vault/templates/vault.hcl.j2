@@ -1,0 +1,25 @@
+# Example Vault Configuration File
+
+# Listener configuration
+listener "tcp" {
+  address = "127.0.0.1:8200"
+  tls_disable = 1
+}
+
+# Storage configuration
+storage "file" {
+  path = "/var/lib/vault/data"
+}
+
+# Seal configuration
+# Example only - for production use, configure a proper seal mechanism
+seal "shamir" {
+  threshold = 1
+  shares = 1
+}
+
+# Disable telemetry
+telemetry {
+  disable_hostname = true
+  prometheus_retention_time = "30s"
+}

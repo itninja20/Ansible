@@ -1,0 +1,22 @@
+#!/bin/bash -u
+
+# /usr/local/bin/handle_external_hdds.sh
+#
+# auto turn off hdd at shutdown
+# 
+
+declare -a uuids=({{ external_hdd.hdd1_uuid }})
+
+# Only proceed if the drive is present.
+if [[ ! -L "/dev/disk/by-uuid/${uuids[0]}" ]]; then
+  exit 0
+fi
+
+for uuid in "${uuids[@]}"; do
+  if findmnt "/dev/disk/by-uuid/$uuid"; then
+    umount "/dev/disk/by-uuid/$uuid"
+  fi
+done
+
+# udisksctl powers off proper drive even if its partition is supplied
+udisksctl power-off -b "/dev/disk/by-uuid/${uuids[0]}"

@@ -1,0 +1,57 @@
+
+- ansible.builtin.debug:
+    msg: "{{ ansible_facts.device_links }}"
+  when: "'sda1' in ansible_facts.device_links.ids and dry_run"
+
+- name: Set external hard drive UUID
+  set_fact:
+    external_hdd.hdd1.uuid: "{{ ansible_facts.device_links.uuids.sda1[0] }}"
+
+- name: Test
+  when: not dry_run
+  block:
+    - name: Disabling bluetooth
+      ansible.builtin.systemd_service:
+        state: stopped
+        enabled: false
+        name: hciuart
+
+
+    - name: Create mount point dirs
+      become: True
+      ansible.builtin.file:
+        path: {{ external_hdd.hdd1.mount_point }}
+        type: directory
+
+    - name: Render config files
+      become: True
+      ansible.builtin.template:
+        src: "{{ item.src }}.j2"
+        dest: "{{ item.dest }}/"
+        owner: "root"
+        group: "root"
+      loop:
+        - { src: hosts, dest: "/etc", mode: "0644"}
+        - { src: dhclient.conf, dest: "/etc/dhcp", mode: "0644"}
+        - { src: fstab, dest: "/etc", mode: "0644"}
+        - { src: handle_external_hdds.sh, dest: "/usr/local/bin", mode: "0770"}
+  
+    - name: Copy files to remote host
+      become: True
+      ansible.builtin.copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}/"
+        owner: "root"
+        group: "root"
+      loop:
+        - { src: handle_external_hdds.service, dest: "{{ global_vars.systemd.path }}", mode: "0644"}
+        - { src: dphys-swapfile, dest: "/etc", mode: "0644"}
+        - { src: zramswap, dest: "{{ zram_conf }}", mode: "0644"}
+        - { src: 10norecommends, dest: "/etc/apt/apt.conf.d", mode: "0644"}
+        
+    - name: install base packages
+      become: True
+      ansible.builtin.apt:
+        pkg: "{{ pkg_list }}"
+      when: ansible_facts.distribution == "Debian"
+

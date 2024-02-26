@@ -1,0 +1,53 @@
+- name: Configure wlan interface
+  block:
+    - name: Get network manager wlan iface uuid
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          nmcli connection show --active |grep wlan0 |cut -d' ' -f3
+        executable: /bin/bash
+      register: uuid_check
+      changed_when: uuid_check != 0
+    - name: Set wlan uuid fact
+      ansible.builtin.set_fact:
+        wlan_nm_uuid: "{{ uuid_check.stdout }}"
+    - name: Get network manager wlan connection timestamp
+      become: true
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          grep -rn timestamp {{ global_vars.network.conf_path }} |cut -d'=' -f2
+        executable: /bin/bash
+      register: tm_check
+      changed_when: tm_check != 0
+    - name: Set wlan connection timestamp fact
+      ansible.builtin.set_fact:
+        wlan_nm_timestamp: "{{ tm_check.stdout }}"
+    - name: Render network manager wlan0 config to remote host
+      ansible.builtin.template:
+        src: wlan0.nmconnection.j2
+        dest: "{{ global_vars.network.conf_path }}"
+        owner: root
+        group: root
+        mode: "0600"
+
+- name: Configure ethernet interface
+  block:
+    - name: Get network manager ethernet iface uuid
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          nmcli connection show |grep eth0 |cut -d' ' -f4
+        executable: /bin/bash
+      register: uuid_check
+      changed_when: uuid_check != 0
+    - name: Set uuid eth fact
+      ansible.builtin.set_fact:
+        eth_nm_uuid: "{{ uuid_check.stdout }}"
+    - name: Render network manager eth0 config to remote host
+      ansible.builtin.template:
+        src: wlan0.nmconnection.j2
+        dest: "{{ global_vars.network.conf_path }}"
+        owner: root
+        group: root
+        mode: "0600"

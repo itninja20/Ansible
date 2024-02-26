@@ -1,0 +1,26 @@
+[Unit]
+Description=Hashicorp Vault Server
+After=network.target auditd.service
+
+[Service]
+Type = simple
+User = {{ vault_user }}
+Group = {{ vault_user }}
+PIDFile = {{ vault_srv.pid }}
+UMask = {{ vault_srv.umask }}
+
+EnvironmentFile=-{{ vault_conf }}
+ExecStartPre=/usr/sbin/sshd -t
+ExecStart=/usr/sbin/sshd -D $SSHD_OPTS
+ExecReload=/usr/sbin/sshd -t
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartPreventExitStatus=255
+Type=notify
+RuntimeDirectory=sshd
+RuntimeDirectoryMode=0755
+
+[Install]
+WantedBy=multi-user.target
+Alias=sshd.service

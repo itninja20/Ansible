@@ -1,0 +1,13 @@
+pkg_list:
+  - neovim
+  - rdfind
+  - mlocate
+  - zram-tools
+  - cpufrequtils
+
+external_hdd:
+  hdd1:
+    uuid: ""
+    mount_point: /mnt/hdd1
+
+zram_conf: /etc/default/zramswap

@@ -1,0 +1,13 @@
+%echo Generating a default key
+Key-Type: {{ global_vars.gpg.type }}
+Key-Length: {{ global_vars.gpg.keylength }}
+Subkey-Type: {{ global_vars.gpg.type }}
+Subkey-Length: {{ global_vars.gpg.keylength }}
+Name-Real: {{ global_vars.gpg.name }}
+Name-Email: {{ global_vars.gpg.mail }}
+Expire-Date: {{ global_vars.gpg.exp_date }}
+%no-ask-passphrase
+%no-protection
+%commit
+%echo done
+EOF

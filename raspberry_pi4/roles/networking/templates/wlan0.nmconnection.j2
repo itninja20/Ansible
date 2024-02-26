@@ -1,0 +1,23 @@
+[connection]
+id={{ global_vars.network.iface.names[1] }}
+uuid={{ wlan_nm_uuid }}
+type={{ global_vars.network.iface.wlan.type }}
+timestamp={{ wlan_nm_timestamp }}
+interface-name={{ global_vars.network.iface.names[1] }}
+
+[wifi]
+mode=infrastructure
+ssid={{ global_vars.network.iface.wlan.ssid }}
+
+[wifi-security]
+key-mgmt={{ global_vars.network.iface.wlan.key_mgmt }}
+psk={{ global_vars.network.iface.wlan.pass }}
+
+[ipv4]
+method={{ global_vars.network.iface.wlan.method }}
+
+[ipv6]
+addr-gen-mode=default
+method=disabled
+
+[proxy]

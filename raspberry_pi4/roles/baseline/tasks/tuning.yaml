@@ -1,0 +1,8 @@
+- name: Get raspberry pi model
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      nmcli connection show -- active |grep wlan0 |cut -d' ' -f3
+    executable: /bin/bash
+  register: nm_uuid
+  changed_when: nm_uuid != 0

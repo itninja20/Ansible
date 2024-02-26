@@ -1,0 +1,11 @@
+dhcp_server:
+  pid_file: /var/run/dhcpd.pid
+  main_conf: /etc/dhcp/dhcpd.conf
+  defaults_conf: /etc/defaults/isc-dhcp-server
+  packages:
+    Debian:
+      - isc-dhcp4-server
+    RedHat:
+      - dhcp
+    Windows:
+      - DHCP

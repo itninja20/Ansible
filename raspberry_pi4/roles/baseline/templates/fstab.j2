@@ -1,0 +1,7 @@
+proc            /proc           proc    defaults          0       0
+PARTUUID=ec244951-01  /boot/firmware  vfat    defaults          0       2
+PARTUUID=ec244951-02  /               ext4    defaults,noatime  0       1
+# a swapfile is not a swap partition, no line here
+#   use  dphys-swapfile swap[on|off]  for that
+
+UUID={{ ansible_facts.device_links.uuids.sda1[0] }} {{ external_hdd.hdd1.mount_point }} btrfs defaults,compress=zstd,commit=120,errors=remount-ro,rw     0   0
