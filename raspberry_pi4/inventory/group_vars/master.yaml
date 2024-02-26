@@ -2,8 +2,14 @@ pi_model: 4
 ansible_user: "ninja"
 hostname: "master"
 net_iface:
-  eth0: "192.168.1.1"
-  wlan0: "192.168.0.100"
+  eth0: 
+    name: eth0
+    ip: "192.168.1.200"
+    uuid: "21d92102-b703-30e4-9f19-f88446784d10"
+  wlan0:
+    name: wlan0
+    ip: "192.168.0.100"
+    uuid: 70f3d776-39b4-4a83-8d15-f6f0f3028722
 partitions:
   boot:
     paruuid: "ec244951-01"
