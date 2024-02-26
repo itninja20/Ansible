@@ -1,0 +1,18 @@
+pi_model: 4
+ansible_user: "ninja"
+hostname: "master"
+net_iface:
+  eth0: "192.168.1.1"
+  wlan0: "192.168.0.100"
+partitions:
+  boot:
+    paruuid: "ec244951-01"
+    mountpoint: "/boot/firmware"
+    fstype: "vfat"
+  root:
+    partuuid: "ec244951-02"
+    mountploint: "/"
+    fstype: "ext4"
+
+
+

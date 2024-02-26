@@ -1,0 +1,57 @@
+---
+- name: Install and configure PXE server on Raspberry Pi
+  hosts: raspberrypi
+  become: yes
+  vars:
+    pxe_root_dir: "/srv/pxe"
+    pxe_netboot_files:
+      - url: "http://archive.raspberrypi.org/debian/pool/main/n/netboot/netboot.tar.gz"
+        dest: "{{ pxe_root_dir }}/netboot.tar.gz"
+
+  tasks:
+    - name: Install required packages
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - dnsmasq
+        - tftpd-hpa
+        - syslinux
+
+    - name: Ensure TFTP root directory exists
+      file:
+        path: "{{ pxe_root_dir }}"
+        state: directory
+
+    - name: Download netboot files
+      get_url:
+        url: "{{ item.url }}"
+        dest: "{{ item.dest }}"
+      with_items: "{{ pxe_netboot_files }}"
+      when: not ansible_check_mode
+
+    - name: Extract netboot files
+      unarchive:
+        src: "{{ pxe_root_dir }}/netboot.tar.gz"
+        dest: "{{ pxe_root_dir }}"
+        remote_src: yes
+      when: not ansible_check_mode
+
+    - name: Configure dnsmasq
+      template:
+        src: dnsmasq.conf.j2
+        dest: /etc/dnsmasq.conf
+      notify:
+        - restart dnsmasq
+
+    - name: Ensure TFTP is enabled and started
+      service:
+        name: tftpd-hpa
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: restart dnsmasq
+      service:
+        name: dnsmasq
+        state: restarted

@@ -1,15 +1,33 @@
-- name: rollout pi4 baseline
-  hosts: access_point
+---
+- name: Raspberry Pi4 cluster base line
+  gather_facts: true
+  hosts:
+    - master
+  vars:
+    dry_run: true
+    global_vars.systemd.units:
+      - networking
+      - NetworkManager
+      - handle_external_hdds
+      - udisks2
+      - zramswap
+      - dphys-swapfile
   tasks:
-    - name: configure apt sources
-      include_role:
+    - name: Os detection
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop:
+        - "OS detected: {{ ansible_facts.distribution + ' ' + ansible_facts.distribution_version }}"
+
+    - name: Rollout
+      ansible.builtin.include_role:
         name: baseline
-        tasks_from: apt/config.yaml
-    - name: install base packages 
-      include_role:
-        name: baseline
-        tasks_from: apt/packages.yaml
-    - name: configure alfa interface
-      include_role:
-        name: baseline
-        tasks_from: networking/rtl8814au.yaml 
+
+    - name: Systemd
+      ansible.builtin.include_role:
+        name: systemd
+        defaults_from: main.yaml
+      loop: "{{ global_vars.systemd_unit }}"
+      vars:
+        unit: "{{ item }}"
+...

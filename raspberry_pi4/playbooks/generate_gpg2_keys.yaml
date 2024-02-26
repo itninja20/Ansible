@@ -1,0 +1,54 @@
+---
+- name: Generate GPG2 Keys & configure keyring
+  hosts:
+    - slave00
+  gather_facts: false
+  vars:
+    generate_keys: true
+    target_email: "jangarcia@pm.me"
+  tasks:
+    - name: Install required packages
+      become: true
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - gnupg2
+        - pass
+        - rng-tools
+
+    - name: Check key ID
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          gpg2 --list-secret-keys --with-colons |head -n1|cut -d':' -f5
+        executable: /bin/bash
+      register: key_id_check
+      changed_when: key_id_check != 0
+
+    - name: Generate new keys if not exists
+      when: '"gpg_keyid" not in key_id_check.stdout'
+      block:
+        - name: Render parameter file
+          ansible.builtin.template:
+            src: gpg2_gen_key.j2
+            dest: "{{ global_vars.gpg.dir }}/gpg2_gen_key"
+            mode: "0644"
+
+        - name: Generate GPG2 keys
+          ansible.builtin.shell: |
+            gpg2 --batch --generate-key {{ global_vars.gpg.dir }}/gpg2_gen_key
+          register: gpg_keygen_result
+          changed_when: gpg_keygen_result != 0
+        - name: Print resulting keys
+          ansible.builtin.debug:
+            var: gpg_keygen_result.stdout_lines
+          changed_when: gpg_keygen_result != 0
+
+    - name: Configure keyring
+      ansible.builtin.shell:
+        cmd: |
+          pass init '{{ gpg_keyid }}'
+        executable: /bin/bash
+      register: shell_output
+      changed_when: shell_output != 0

@@ -1,0 +1,12 @@
+pi_model: 3
+ansible_user: "ninja"
+hostname: slave00
+gpg_keyid: "86678EC1568C4AE1"
+mac:
+  eth0: "b8:27:eb:90:90:f8"
+internal_net:
+  iface: "eth0"
+  ipaddr: "192.168.1.1"
+  netmask: "255.255.255.0"
+  gateway: "192.168.1.1"
+external_iface: "wlan0"

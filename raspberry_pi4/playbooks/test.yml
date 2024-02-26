@@ -1,0 +1,22 @@
+---
+- name: Read keys
+  gather_facts: true
+  hosts:
+    - master
+  tasks:
+    - name: Get model
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop:
+        - "{{ ansible_facts }}"
+
+    - name: Get raspberry pi model
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail
+          cat /proc/cpuinfo|grep Model|cut -d' ' -f4
+        executable: /bin/bash
+      register: pi_model
+      changed_when: pi_model != 0
+
+...

@@ -1,0 +1,37 @@
+global_vars:
+  gpg:
+    dir: /home/{{ansible_user}}/.gnupg
+    name: ryan garcia
+    mail: jangarcia@pm.me
+    passphrase: default
+    type: RSA
+    keylength: 4096
+    exp_date: 0
+  network:
+    conf_path: /etc/NetworkManager/system-connections
+    iface:
+      names:
+        - eth0
+        - wlan0
+      eth:
+        type: ethernet
+        method: auto
+        mac: ""
+      wlan:
+        type: wifi
+        method: auto
+        mac: ""
+        ssid: UPC2206032_5G
+        key_mgmt: wpa-psk
+        pass: a8c5d8536c33a99933c95a63830a086e55fdce679e4069fee84e3775c1a8fbfa
+    domain: home
+    netmask: 255.255.255.0
+    gateway: 192.168.1.1
+    broadcast: 192.168.1.255
+    static: True
+    ip_range:
+      start: 192.168.1.100
+      end: 192.168.1.130
+  systemd:
+    units: []
+    path: /etc/systemd/system

@@ -1,0 +1,55 @@
+---
+- name: Install HashiCorp Vault on Raspberry Pi
+  hosts: your_raspberry_pi_host
+  become: yes
+
+  tasks:
+    - name: Ensure required packages are installed
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - unzip
+        - wget
+
+    - name: Download HashiCorp Vault binary
+      get_url:
+        url: "https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_arm.zip"
+        dest: /tmp/vault.zip
+
+    - name: Extract HashiCorp Vault binary
+      unarchive:
+        src: /tmp/vault.zip
+        dest: /usr/local/bin
+        remote_src: yes
+        creates: /usr/local/bin/vault
+
+    - name: Set permissions on Vault binary
+      file:
+        path: /usr/local/bin/vault
+        mode: "0755"
+
+    - name: Create Vault configuration directory
+      file:
+        path: /etc/vault.d
+        state: directory
+        mode: "0755"
+
+    - name: Create Vault data directory
+      file:
+        path: /var/lib/vault
+        state: directory
+        mode: "0755"
+
+    - name: Create Vault systemd service file
+      template:
+        src: vault.service.j2
+        dest: /etc/systemd/system/vault.service
+      notify:
+        - Restart Vault
+
+  handlers:
+    - name: Restart Vault
+      service:
+        name: vault
+        state: restarted
