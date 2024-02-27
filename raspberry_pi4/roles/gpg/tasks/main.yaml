@@ -1,0 +1,48 @@
+- name: Install required packages
+  become: true
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - gnupg2
+
+- name: Check key ID
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      gpg2 --list-secret-keys --with-colons |head -n1|cut -d':' -f5
+    executable: /bin/bash
+  register: key_id_check
+  changed_when: key_id_check.rc != 0
+
+- name: Generate new keys if not exists
+  when: key_id_check.stdout == ""
+  block:
+    - name: Render parameter file
+      ansible.builtin.template:
+        src: gpg2_gen_key.j2
+        dest: "{{ global_vars.gpg.dir }}/gpg2_gen_key"
+        mode: "0644"
+    - name: Generate GPG2 keys
+      ansible.builtin.shell: |
+        gpg2 --batch --generate-key {{ global_vars.gpg.dir }}/gpg2_gen_key
+      register: gpg_keygen_result
+      changed_when: gpg_keygen_result != 0
+    - name: Print resulting keys
+      ansible.builtin.debug:
+        var: gpg_keygen_result.stdout_lines
+      changed_when: gpg_keygen_result != 0
+
+- name: Print out message if key is present
+  when: key_id_check.stdout != ""
+  ansible.builtin.debug:
+    msg: "Key {{ gpg_key }} was found on remote host."
+- name: Checking parameter file
+  ansible.builtin.stat:
+    path: "{{ global_vars.gpg.dir }}/gpg2_gen_key"
+  register: parameter_file
+- name: Delete prarameter file
+  when: parameter_file.stat is defined
+  ansible.builtin.file:
+    path: "{{ global_vars.gpg.dir }}/gpg2_gen_key"
+    state: absent
